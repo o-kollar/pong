@@ -4,7 +4,7 @@ const ctx = canvas.getContext('2d');
 // Define the environment
 const env = {
     getNumStates: function () {
-        return 10;
+        return 8;
     },
     getMaxNumActions: function () {
         return 2;
@@ -97,9 +97,7 @@ function getGameState(paddle, opponentPaddle, previousPaddleY) {
         ball.y, // Ball y-position
         ball.x, // Ball x-position
         ball.dx, // Ball x-velocity
-        ball.dx > 0 ? 1 : -1, // Ball x-direction
-        ball.dy, // Ball y-velocity
-        ball.dy > 0 ? 1 : -1, // Ball y-direction
+        ball.dy, // Ball y-velocity 
         paddle.y, // Paddle y-position
         (paddle.y - ball.y) / canvas.height, // Paddle relative y-position
         paddle.y - previousPaddleY, // Paddle movement direction
@@ -114,7 +112,6 @@ function movePaddles() {
     const RedState = getGameState(paddleLeft, paddleRight,previousPaddleLeftY);
     const BlueState = getGameState(paddleRight, paddleLeft,previousPaddleRightY);
     
-
     const action1 = Red.act(RedState);
     const action2 = Blue.act(BlueState);
 
