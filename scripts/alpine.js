@@ -10,7 +10,7 @@ let data = Alpine.reactive({
         num_hidden_units: 64,
     },
     gameConfig:{
-        gameSpeed:20,
+        gameSpeed:10,
         redPlayer:false,
         scoreLeft:0,
         scoreRight:0
