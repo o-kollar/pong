@@ -15,14 +15,15 @@ const env = {
 
 
 // Create agents
-let agent1 = new Agent(env, data.agentConfig);
-let agent2 = new Agent(env, data.agentConfig);
+let Red = new Agent(env, data.agentConfig);
+let Blue = new Agent(env, data.agentConfig);
 
 function loadAgent(){
-  agent1.buildNet();
-  agent2.buildNet();
+  Red.buildNet();
+  Blue.buildNet();
    data.gameConfig.scoreLeft = 0;
    data.gameConfig.scoreRight = 0;
+   data.gameConfig.touchLeft
 }
 
 // Initialize game elements
@@ -84,7 +85,7 @@ function moveBall() {
 // Move paddles based on actions
 function movePaddles() {
     // Get actions from agents
-    let agent1State = [
+    let RedState = [
         ball.y, // Ball y-position
         ball.x, // Ball x-position
         ball.dx, // Ball x-velocity
@@ -97,7 +98,7 @@ function movePaddles() {
         (paddleRight.y - ball.y) / canvas.height, // Right paddle relative y-position
     ];
     
-    let agent2State = [
+    let BlueState = [
         ball.y, // Ball y-position
         ball.x, // Ball x-position
         ball.dx, // Ball x-velocity
@@ -110,13 +111,13 @@ function movePaddles() {
         (paddleLeft.y - ball.y) / canvas.height, // Left paddle relative y-position
     ];
 
-    const action1 = agent1.act(agent1State);
-    const action2 = agent2.act(agent2State);
+    const action1 = Red.act(RedState);
+    const action2 = Blue.act(BlueState);
 
     previousPaddleLeftY = paddleLeft.y;
     previousPaddleRightY = paddleRight.y;
 
-    if (data.gameConfig.redPlayer) {
+    if (data.gameConfig.redPlayer === true) {
         // Add event listener for keydown event
         document.addEventListener('keydown', function(event) {
             // Check if the pressed key is the "W" key
@@ -131,19 +132,19 @@ function movePaddles() {
     } else {
         // Move left paddle based on AI action
         if (action1 === 0 && paddleLeft.y > 0) {
-            paddleLeft.y -= 5;
+            paddleLeft.y -= 10;
         }
         if (action1 === 1 && paddleLeft.y < canvas.height - paddleLeft.height) {
-            paddleLeft.y += 5;
+            paddleLeft.y += 10;
         }
     }
 
     // Move right paddle based on AI action
     if (action2 === 0 && paddleRight.y > 0) {
-        paddleRight.y -= 5;
+        paddleRight.y -= 10;
     }
     if (action2 === 1 && paddleRight.y < canvas.height - paddleRight.height) {
-        paddleRight.y += 5;
+        paddleRight.y += 10;
     }
 }
 
@@ -154,13 +155,12 @@ function calculateDistance(ballX, paddleX) {
 
 // Calculate reward based on score and distance
 function calculateReward(score, distance) {
-    return -score / 10000 * distance;
+    return -score / 1000 * distance;
 }
 
 let reward1 = [] 
 let reward2 = []
-let touched1 = false;
-let touched2 = false;
+
 
 // Function to handle collisions and update rewards
 function handleCollisions() {
@@ -174,7 +174,7 @@ function handleCollisions() {
     function updateRewardsAndLearning(agent, rewardArray, score, touched) {
         agent.learn(score);
         if (touched) {
-            agent.learn(score / 10000);
+            agent.learn(score / 1000);
             touched = false;
         }
         rewardArray.push(score);
@@ -182,18 +182,18 @@ function handleCollisions() {
 
     // Check collision with left paddle
     if (ball.x - ball.radius <= paddleLeft.x + paddleLeft.width && ball.y >= paddleLeft.y && ball.y <= paddleLeft.y + paddleLeft.height) {
-        touched1 = true;
+        data.gameConfig.touchLeft = true;
         ball.dx = Math.abs(ball.dx) + 0.5; // Increase horizontal velocity and reverse direction
         ball.dy *= 1; // Increase vertical velocity slightly
-        updateRewardsAndLearning(agent1, reward1, RewardLeft, touched2);
+        updateRewardsAndLearning(Red, reward1, RewardLeft, data.gameConfig.touchedRight);
     }
 
     // Check collision with right paddle
     if (ball.x + ball.radius >= paddleRight.x && ball.y >= paddleRight.y && ball.y <= paddleRight.y + paddleRight.height) {
-        touched2 = true;
+        data.gameConfig.touchedRight = true;
         ball.dx = -Math.abs(ball.dx) - 0.5; // Increase horizontal velocity and reverse direction
         ball.dy *= 1; // Increase vertical velocity slightly
-        updateRewardsAndLearning(agent2, reward2, RewardRight, touched1);
+        updateRewardsAndLearning(Blue, reward2, RewardRight, data.gameConfig.touchLeft);
     }
 
     // Score points and reset ball position if it goes out of bounds
@@ -208,10 +208,10 @@ function handleCollisions() {
     }
 
     if (ball.x - ball.radius < 0) {
-        scoreAndResetBall(agent1, reward1, RewardLeft, touched2);
+        scoreAndResetBall(Red, reward1, RewardLeft, data.gameConfig.touchedRight);
         data.gameConfig.scoreRight++;
     } else if (ball.x + ball.radius > canvas.width) {
-        scoreAndResetBall(agent2, reward2, RewardRight, touched1);
+        scoreAndResetBall(Blue, reward2, RewardRight, data.gameConfig.touchLeft);
         data.gameConfig.scoreLeft++;
     }
 }
@@ -223,10 +223,10 @@ function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draw paddles
-    ctx.fillStyle = 'red'; // Set fill style to red for agent1's paddle
+    ctx.fillStyle = 'red'; // Set fill style to red for Red's paddle
     ctx.fillRect(paddleLeft.x, paddleLeft.y, paddleLeft.width, paddleLeft.height);
 
-    ctx.fillStyle = 'blue'; // Set fill style to blue for agent2's paddle
+    ctx.fillStyle = 'blue'; // Set fill style to blue for Blue's paddle
     ctx.fillRect(paddleRight.x, paddleRight.y, paddleRight.width, paddleRight.height);
 
     // Draw ball
