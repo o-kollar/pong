@@ -267,6 +267,27 @@ var fillRandn = function(m, mu, std) {
       }
       return out;
     },
+    gelu: function(m) {
+      // GELU activation function
+      var out = new Mat(m.n, m.d);
+      var n = m.w.length;
+      for(var i = 0; i < n; i++) { 
+          var x = m.w[i];
+          out.w[i] = 0.5 * x * (1 + Math.tanh(Math.sqrt(2 / Math.PI) * (x + 0.044715 * Math.pow(x, 3))));
+      }
+  
+      if(this.needs_backprop) {
+          var backward = function() {
+              for(var i = 0; i < n; i++) {
+                  var x = m.w[i];
+                  var deriv = 0.5 * (1 + Math.tanh(Math.sqrt(2 / Math.PI) * (x + 0.044715 * Math.pow(x, 3))));
+                  m.dw[i] += out.dw[i] * deriv;
+              }
+          }
+          this.backprop.push(backward);
+      }
+      return out;
+  },
     sigmoid: function(m) {
       // sigmoid nonlinearity
       var out = new Mat(m.n, m.d);

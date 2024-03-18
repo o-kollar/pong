@@ -82,71 +82,78 @@ function moveBall() {
     }
 }
 
-// Move paddles based on actions
+
+
+// Function to update previous paddle positions
+function updatePreviousPaddlePositions() {
+    previousPaddleLeftY = paddleLeft.y;
+    previousPaddleRightY = paddleRight.y;
+}
+
+
+// Function to get game state
+function getGameState(paddle, opponentPaddle, previousPaddleY) {
+    return [
+        ball.y, // Ball y-position
+        ball.x, // Ball x-position
+        ball.dx, // Ball x-velocity
+        ball.dx > 0 ? 1 : -1, // Ball x-direction
+        ball.dy, // Ball y-velocity
+        ball.dy > 0 ? 1 : -1, // Ball y-direction
+        paddle.y, // Paddle y-position
+        (paddle.y - ball.y) / canvas.height, // Paddle relative y-position
+        paddle.y - previousPaddleY, // Paddle movement direction
+        (opponentPaddle.y - ball.y) / canvas.height, // Opponent paddle relative y-position
+    ];
+}
+  
+
+
 function movePaddles() {
     // Get actions from agents
-    let RedState = [
-        ball.y, // Ball y-position
-        ball.x, // Ball x-position
-        ball.dx, // Ball x-velocity
-        ball.dx > 0 ? 1 : -1, // Ball x-direction
-        ball.dy, // Ball y-velocity
-        ball.dy > 0 ? 1 : -1, // Ball y-direction
-        paddleLeft.y, // Left paddle y-position
-        (paddleLeft.y - ball.y) / canvas.height, // Left paddle relative y-position
-        paddleLeft.y - previousPaddleLeftY, // Left paddle movement direction
-        (paddleRight.y - ball.y) / canvas.height, // Right paddle relative y-position
-    ];
+    const RedState = getGameState(paddleLeft, paddleRight,previousPaddleLeftY);
+    const BlueState = getGameState(paddleRight, paddleLeft,previousPaddleRightY);
     
-    let BlueState = [
-        ball.y, // Ball y-position
-        ball.x, // Ball x-position
-        ball.dx, // Ball x-velocity
-        ball.dx > 0 ? 1 : -1, // Ball x-direction
-        ball.dy, // Ball y-velocity
-        ball.dy > 0 ? 1 : -1, // Ball y-direction
-        paddleRight.y, // Right paddle y-position
-        (paddleRight.y - ball.y) / canvas.height, // Right paddle relative y-position
-        paddleRight.y - previousPaddleRightY, // Right paddle movement direction
-        (paddleLeft.y - ball.y) / canvas.height, // Left paddle relative y-position
-    ];
 
     const action1 = Red.act(RedState);
     const action2 = Blue.act(BlueState);
 
-    previousPaddleLeftY = paddleLeft.y;
-    previousPaddleRightY = paddleRight.y;
+    // Update previous paddle positions
+    updatePreviousPaddlePositions();
 
+    // Move left paddle
+    movePaddle(action1, paddleLeft, 'w', 's', previousPaddleLeftY);
+
+    // Move right paddle
+    movePaddle(action2, paddleRight, 'ArrowUp', 'ArrowDown', previousPaddleRightY);
+}
+
+// Function to move paddle
+function movePaddle(action, paddle, upKey, downKey, previousPaddleY) {
+    // Check if the player is controlling the paddle
     if (data.gameConfig.redPlayer === true) {
         // Add event listener for keydown event
         document.addEventListener('keydown', function(event) {
-            // Check if the pressed key is the "W" key
-            if (event.key === 'w' && paddleLeft.y > 0) {
-                paddleLeft.y -= 0.08; // Move the left paddle up
+            // Check if the pressed key is the up key
+            if (event.key === upKey && paddle.y > 0) {
+                paddle.y -= 0.08; // Move the paddle up
             }
-            // Check if the pressed key is the "S" key
-            if (event.key === 's' && paddleLeft.y < canvas.height - paddleLeft.height) {
-                paddleLeft.y += 0.08; // Move the left paddle down
+            // Check if the pressed key is the down key
+            if (event.key === downKey && paddle.y < canvas.height - paddle.height) {
+                paddle.y += 0.08; // Move the paddle down
             }
-        })
+        });
     } else {
-        // Move left paddle based on AI action
-        if (action1 === 0 && paddleLeft.y > 0) {
-            paddleLeft.y -= 10;
+        // Move paddle based on AI action
+        if (action === 0 && paddle.y > 0) {
+            paddle.y -= 10; // Move the paddle up
         }
-        if (action1 === 1 && paddleLeft.y < canvas.height - paddleLeft.height) {
-            paddleLeft.y += 10;
+        if (action === 1 && paddle.y < canvas.height - paddle.height) {
+            paddle.y += 10; // Move the paddle down
         }
-    }
-
-    // Move right paddle based on AI action
-    if (action2 === 0 && paddleRight.y > 0) {
-        paddleRight.y -= 10;
-    }
-    if (action2 === 1 && paddleRight.y < canvas.height - paddleRight.height) {
-        paddleRight.y += 10;
     }
 }
+
 
 // Calculate distance between the ball and a paddle
 function calculateDistance(ballX, paddleX) {
@@ -155,7 +162,7 @@ function calculateDistance(ballX, paddleX) {
 
 // Calculate reward based on score and distance
 function calculateReward(score, distance) {
-    return -score / 1000 * distance;
+    return -(score / 1000) * distance;
 }
 
 let reward1 = [] 
@@ -171,12 +178,14 @@ function handleCollisions() {
     const RewardRight = calculateReward(data.gameConfig.scoreLeft, distToRightPaddle);
 
     // Function to update rewards and learning for agents
-    function updateRewardsAndLearning(agent, rewardArray, score, touched) {
-        agent.learn(score);
-        if (touched) {
-            agent.learn(score / 1000);
+    function updateRewardsAndLearning(agent, rewardArray, score, touched,points) {
+
+    
+            agent.learn(points / 1000);
+            console.log("Points",points/1000) 
             touched = false;
-        }
+        
+        
         rewardArray.push(score);
     }
 
@@ -185,7 +194,7 @@ function handleCollisions() {
         data.gameConfig.touchLeft = true;
         ball.dx = Math.abs(ball.dx) + 0.5; // Increase horizontal velocity and reverse direction
         ball.dy *= 1; // Increase vertical velocity slightly
-        updateRewardsAndLearning(Red, reward1, RewardLeft, data.gameConfig.touchedRight);
+        updateRewardsAndLearning(Red, reward1, RewardLeft, data.gameConfig.touchedRight,data.gameConfig.scoreLeft);
     }
 
     // Check collision with right paddle
@@ -193,26 +202,52 @@ function handleCollisions() {
         data.gameConfig.touchedRight = true;
         ball.dx = -Math.abs(ball.dx) - 0.5; // Increase horizontal velocity and reverse direction
         ball.dy *= 1; // Increase vertical velocity slightly
-        updateRewardsAndLearning(Blue, reward2, RewardRight, data.gameConfig.touchLeft);
+        updateRewardsAndLearning(Blue, reward2, RewardRight, data.gameConfig.touchLeft,data.gameConfig.scoreRight);
     }
 
     // Score points and reset ball position if it goes out of bounds
-    function scoreAndResetBall(agent, rewardArray, score, touched) {
-        agent.learn(score);
-        if (touched) {
-            agent.learn(score / 10000);
-            touched = false;
-        }
+    function scoreAndResetBall(agent, oponent, rewardArray, score, touched,opponentScore) {
+      console.log(score)
+      agent.learn(score);
+      
         rewardArray.push(score);
         resetBall();
     }
 
     if (ball.x - ball.radius < 0) {
-        scoreAndResetBall(Red, reward1, RewardLeft, data.gameConfig.touchedRight);
-        data.gameConfig.scoreRight++;
+        if(data.gameConfig.scoreRight < 100){
+            if(data.gameConfig.scoreLeft > 0){ data.gameConfig.scoreLeft--;}
+           
+            data.gameConfig.scoreRight++;
+        }else{
+       data.gameConfig.scoreRight = 0;
+          data.gameConfig.winRight++;
+          if(data.gameConfig.winRight > data.gameConfig.winLeft){
+            Red.buildNet()
+            data.gameConfig.winRight = 0
+          }
+        }
+
+        scoreAndResetBall(Red,Blue, reward1, RewardLeft, data.gameConfig.touchedRight,data.gameConfig.scoreRight);
+
     } else if (ball.x + ball.radius > canvas.width) {
-        scoreAndResetBall(Blue, reward2, RewardRight, data.gameConfig.touchLeft);
-        data.gameConfig.scoreLeft++;
+        if(data.gameConfig.scoreLeft <100){
+            data.gameConfig.scoreLeft++;
+            if(data.gameConfig.scoreRight > 0){
+                data.gameConfig.scoreRight--;
+            }
+            
+        }else{
+           data.gameConfig.scoreLeft = 0;
+           data.gameConfig.winLeft++;
+           if(data.gameConfig.winLeft > data.gameConfig.winRight){
+             Blue.buildNet();
+             data.gameConfig.winLeft = 0
+           }
+        }
+       
+        scoreAndResetBall(Blue,Red, reward2, RewardRight, data.gameConfig.touchLeft,data.gameConfig.scoreLeft);
+
     }
 }
 

@@ -33,12 +33,14 @@
             <div class="nes-container is-rounded is-dark">
                 <canvas class="w-full h-full " id="pongCanvas"></canvas>
             </div>
-            <!-- <div id="chart"></div> -->
+          
 
             <label>
                 <input x-model="data.gameConfig.redPlayer" type="checkbox" class="nes-checkbox is-dark" />
                 <span class="text-white">Play as</span><span class="text-red-400"> Red</span>
             </label>
+            <p x-text="data.gameConfig.winLeft" class="text-red-400"></p>
+            <p x-text="data.gameConfig.winRight" class="text-blue-400"></p> 
 
             <div class="grid grid-cols-1 gap-4 lg:grid-cols-2  lg:gap-8">
                 <div class="h-32  grid grid-rows-2 rounded-lg ">
