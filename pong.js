@@ -146,64 +146,76 @@ function movePaddles() {
         paddleRight.y += 5;
     }
 }
-reward1 = [];
-reward2 = [];
 
+// Calculate distance between the ball and a paddle
+function calculateDistance(ballX, paddleX) {
+    return Math.abs(ballX - paddleX);
+}
+
+// Calculate reward based on score and distance
+function calculateReward(score, distance) {
+    return -score / 10000 * distance;
+}
+
+let reward1 = [] 
+let reward2 = []
+let touched1 = false;
+let touched2 = false;
+
+// Function to handle collisions and update rewards
 function handleCollisions() {
-    // Calculate distance between ball and left paddle
-    const distToLeftPaddle = Math.abs(ball.x - paddleLeft.x);
+    const distToLeftPaddle = calculateDistance(ball.x, paddleLeft.x);
+    const distToRightPaddle = calculateDistance(ball.x, paddleRight.x);
 
-    // Calculate distance between ball and right paddle
-    const distToRightPaddle = Math.abs(ball.x - paddleRight.x);
+    const RewardLeft = calculateReward(data.gameConfig.scoreRight, distToLeftPaddle);
+    const RewardRight = calculateReward(data.gameConfig.scoreLeft, distToRightPaddle);
 
-    // Determine negative reward based on distance from the ball
-    const RewardLeft = -0.01 * distToLeftPaddle; // Adjust the factor as needed
-    const RewardRight = -0.01 * distToRightPaddle; // Adjust the factor as needed
-
-    // Check for collisions with the top and bottom walls
-    if (ball.y + ball.dy > canvas.height - ball.radius || ball.y + ball.dy < ball.radius) {
-        ball.dy = -ball.dy;
+    // Function to update rewards and learning for agents
+    function updateRewardsAndLearning(agent, rewardArray, score, touched) {
+        agent.learn(score);
+        if (touched) {
+            agent.learn(score / 10000);
+            touched = false;
+        }
+        rewardArray.push(score);
     }
 
     // Check collision with left paddle
     if (ball.x - ball.radius <= paddleLeft.x + paddleLeft.width && ball.y >= paddleLeft.y && ball.y <= paddleLeft.y + paddleLeft.height) {
-        agent1.learn(0.02);
-        reward1.push(0.02)
+        touched1 = true;
         ball.dx = Math.abs(ball.dx) + 0.5; // Increase horizontal velocity and reverse direction
         ball.dy *= 1; // Increase vertical velocity slightly
+        updateRewardsAndLearning(agent1, reward1, RewardLeft, touched2);
     }
 
     // Check collision with right paddle
     if (ball.x + ball.radius >= paddleRight.x && ball.y >= paddleRight.y && ball.y <= paddleRight.y + paddleRight.height) {
-       // agent2.learn(0.02);
-        reward2.push(0.02)
+        touched2 = true;
         ball.dx = -Math.abs(ball.dx) - 0.5; // Increase horizontal velocity and reverse direction
         ball.dy *= 1; // Increase vertical velocity slightly
+        updateRewardsAndLearning(agent2, reward2, RewardRight, touched1);
     }
 
     // Score points and reset ball position if it goes out of bounds
-    if (ball.x - ball.radius < 0) {
-        // Right player scores
-        agent1.learn(RewardLeft);
-        reward1.push(RewardLeft)
-       
-
-        data.gameConfig.scoreRight++;
+    function scoreAndResetBall(agent, rewardArray, score, touched) {
+        agent.learn(score);
+        if (touched) {
+            agent.learn(score / 10000);
+            touched = false;
+        }
+        rewardArray.push(score);
         resetBall();
-    } else if (ball.x + ball.radius > canvas.width) {
-        // Left player scores
-        agent2.learn(RewardRight);
-        reward2.push(RewardRight)
-        
-
-        data.gameConfig.scoreLeft++;
-        resetBall();
-    }else{
-        agent1.learn(0);
-        agent2.learn(0);
     }
-    
+
+    if (ball.x - ball.radius < 0) {
+        scoreAndResetBall(agent1, reward1, RewardLeft, touched2);
+        data.gameConfig.scoreRight++;
+    } else if (ball.x + ball.radius > canvas.width) {
+        scoreAndResetBall(agent2, reward2, RewardRight, touched1);
+        data.gameConfig.scoreLeft++;
+    }
 }
+
 
 // Draw game elements
 function draw() {
