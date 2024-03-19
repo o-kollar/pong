@@ -2,21 +2,11 @@ const canvas = document.getElementById('pongCanvas');
 const ctx = canvas.getContext('2d');
 
 // Define the environment
-const env = {
-    getNumStates: function () {
-        return 8;
-    },
-    getMaxNumActions: function () {
-        return 2;
-    },
-};
-
-// Define agent configuration
 
 
-// Create agents
-let Red = new Agent(env, data.agentConfig);
-let Blue = new Agent(env, data.agentConfig);
+
+let Red = new Agent(data.gameConfig.env, data.agentConfig);
+let Blue = new Agent(data.gameConfig.env, data.agentConfig);
 
 function loadAgent(){
   Red.buildNet();
