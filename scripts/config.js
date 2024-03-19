@@ -19,6 +19,7 @@ let data = Alpine.reactive({
         winRight:0,
         iterationLeft:0,
         iterationRight:0,
+        scores:[0,0]
     }
 })
 

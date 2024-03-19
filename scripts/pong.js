@@ -24,6 +24,7 @@ function loadAgent(){
    data.gameConfig.scoreLeft = 0;
    data.gameConfig.scoreRight = 0;
    data.gameConfig.touchLeft
+   data.gameConfig.scores = [0,0]
 }
 
 // Initialize game elements
@@ -188,8 +189,7 @@ function handleCollisions() {
     }
 
     // Score points and reset ball position if it goes out of bounds
-    function scoreAndResetBall(agent, oponent, rewardArray, score, touched,opponentScore) {
-      console.log(score)
+    function scoreAndResetBall(agent, rewardArray, score) {
       agent.learn(score);
       
         rewardArray.push(score);
@@ -199,7 +199,7 @@ function handleCollisions() {
     if (ball.x - ball.radius < 0) {
         if(data.gameConfig.scoreRight < 100){
             if(data.gameConfig.scoreLeft > 0){ data.gameConfig.scoreLeft--;}
-           
+            data.gameConfig.scores[1]++;
             data.gameConfig.scoreRight++;
         }else{
        data.gameConfig.scoreRight = 0;
@@ -207,11 +207,13 @@ function handleCollisions() {
           if(data.gameConfig.winRight > data.gameConfig.winLeft){
             data.gameConfig.iterationRight++
             Red.buildNet()
+            data.gameConfig.iterationLeft = 0
             data.gameConfig.winRight = 0
+            data.gameConfig.scores = [0,0];
           }
         }
 
-        scoreAndResetBall(Red,Blue, reward1, RewardLeft, data.gameConfig.touchedRight,data.gameConfig.scoreRight);
+        scoreAndResetBall(Red, reward1, RewardLeft);
 
     } else if (ball.x + ball.radius > canvas.width) {
         if(data.gameConfig.scoreLeft <100){
@@ -219,6 +221,7 @@ function handleCollisions() {
             if(data.gameConfig.scoreRight > 0){
                 data.gameConfig.scoreRight--;
             }
+            data.gameConfig.scores[0]++;
             
         }else{
            data.gameConfig.scoreLeft = 0;
@@ -226,11 +229,13 @@ function handleCollisions() {
            if(data.gameConfig.winLeft > data.gameConfig.winRight){
             data.gameConfig.iterationLeft++
              Blue.buildNet();
+             data.gameConfig.iterationRight = 0;
              data.gameConfig.winLeft = 0
+             data.gameConfig.scores = [0,0];
            }
         }
        
-        scoreAndResetBall(Blue,Red, reward2, RewardRight, data.gameConfig.touchLeft,data.gameConfig.scoreLeft);
+        scoreAndResetBall(Blue, reward2, RewardRight);
 
     }
 }
@@ -258,8 +263,8 @@ function draw() {
     // Draw scores
     ctx.font = '12px "Courier New", Courier, monospace';
     ctx.fillStyle = 'white';
-    ctx.fillText(`Score: ${data.gameConfig.scoreLeft}`, 20, 30);
-    ctx.fillText(`Score: ${data.gameConfig.scoreRight}`, canvas.width - 120, 30);
+    ctx.fillText(`Score: ${data.gameConfig.scores[0]}`, 20, 30);
+    ctx.fillText(`Score: ${data.gameConfig.scores[1]}`, canvas.width - 120, 30);
 }
 
 

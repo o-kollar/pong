@@ -18,141 +18,149 @@
 </head>
 
 <body class="w-full h-full bg-[conic-gradient(at_bottom_left,_var(--tw-gradient-stops))] from-slate-100  to-amber-100">
-    <span class="nes-text m-5 pt-4 pl-4  text-5xl text-blue-600">DQN</span>
-    <p class="text-sm p-2 m-5">Deep Q-Network, is a reinforcement learning algorithm that combines the
-        strengths of deep learning and Q-learning. </p>
 
-    <a href="http://ir.hit.edu.cn/~jguo/docs/notes/dqn-atari.pdf" class="text-blue-600 text-xs p-6" target="_blank">Read
-        More</a>
+    <div class="grid grid-cols-1 gap-4">
+        <div class="p-4">
+            <span class="nes-text m-2 pt-4 pl-4  text-5xl text-blue-600">DQN</span>
+            <p class="text-sm p-2 m-2">Deep Q-Network, is a reinforcement learning algorithm that combines the
+                strengths of deep learning and Q-learning. </p>
+                <p class="text-xs p-2 mx-2"> The main idea behind DQN is to use a deep neural network to estimate the expected
+                    future rewards (Q-values) for
+                    each possible action in a given state. </p>
+                <p class="text-xs p-2 mx-2"> By training the neural network on the agent's experiences, DQN can learn
+                    to map high-dimensional states to the best actions to take in those states.</p>
+                     <a href="http://ir.hit.edu.cn/~jguo/docs/notes/dqn-atari.pdf" class="text-blue-600 text-xs p-4" target="_blank">Read
+                More</a>
+        </div>
+        <div class="p-6 ">
 
-
-
-
-    <div class="grid w-full grid-cols-1  gap-4 lg:grid-cols-2 lg:gap-8">
-        <div class="p-2 h-99 min-h-32  bg-zinc-700  min-w-full">
-            <div class="nes-container  is-rounded is-dark ">
-                <canvas class="w-full h-full " id="pongCanvas"></canvas>
-            </div>
-
-
-            <div class="grid grid-cols-1 gap-4 lg:grid-cols-2  lg:gap-8">
-                <div class="p-2">
-                    <p x-text="data.gameConfig.scoreRight/100 + data.gameConfig.iterationRight" class="text-blue-400"></p>
-
-                    <progress x-bind:value="data.gameConfig.scoreRight" class="nes-progress is-primary"  max="100"></progress>
-                    <p x-text="data.gameConfig.scoreLeft/100 + data.gameConfig.iterationLeft" class="text-red-400"></p>
-                    <progress x-bind:value="data.gameConfig.scoreLeft" class="nes-progress is-error" max="100"></progress>
+            <div class="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-8">
+                <div class="">
+                    <p class="text-xl my-4 text-blue-600">Configuration</p>
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class=" ">
+                            <div class="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-8">
+                                <div class="">
+                                    <div class="nes-field">
+                                        <label for="name_field">gamma</label>
+                                        <input x-model="data.agentConfig.gamma" x-text="data.agentConfig.gamma" type="text"
+                                            id="name_field" class="nes-input">
+                                    </div>
+                                    <p class="text-xs my-4">determines the importance of future rewards.</p>
+                                </div>
+                                <div class="">
+                                    <div class="nes-field">
+                                        <label for="name_field">epsilon</label>
+                                        <input x-model="data.agentConfig.epsilon" x-text="data.agentConfig.epsilon"
+                                            type="text" id="name_field" class="nes-input">
+                                    </div>
+                                    <p class="text-xs my-4">It balances exploration (trying new actions) and exploitation
+                                        (choosing the best action based on current knowledge).</p>
+                                </div>
+                                <div class="">
+                                    <div class="nes-field">
+                                        <label for="name_field">alpha</label>
+                                        <input x-model="data.agentConfig.alpha" x-text="data.agentConfig.alpha" type="text"
+                                            id="name_field" class="nes-input">
+                                    </div>
+                                    <p class="text-xs my-4">It controls how much the Q-values are adjusted based on new
+                                        experiences.</p>
+                                </div>
+                              </div> 
+                        </div>
+                        <div class="">
+                            <div class="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-8">
+                                <div class="">
+                                    <div class="nes-field">
+                                        <label for="name_field">Learning Steps</label>
+                                        <input x-model="data.agentConfig.learning_steps_per_iteration"
+                                            x-text="data.agentConfig.learning_steps_per_iteration" type="text"
+                                            id="name_field" class="nes-input">
+                                    </div>
+                                    <p class="text-xs my-4">The number of learning steps (updates to the neural network)
+                                        performed per iteration.</p>
+                                </div>
+                                <div class="">
+                                    <div class="nes-field">
+                                        <label for="name_field">Experience size</label>
+                                        <input x-model="data.agentConfig.experience_size"
+                                            x-text="data.agentConfig.experience_size" type="text" id="name_field"
+                                            class="nes-input">
+                                    </div>
+                                    <p class="text-xs my-4">A larger replay buffer allows the agent to learn from a diverse
+                                        set of experiences</p>
+                                </div>
+                                <div class="">
+                                    <div class="nes-field">
+                                        <label for="name_field">Hidden units</label>
+                                        <input x-model="data.agentConfig.num_hidden_units"
+                                            x-text="data.agentConfig.num_hidden_units" type="text" id="name_field"
+                                            class="nes-input">
+                                    </div>
+                                    <p class="text-xs my-4">Hidden units are the neurons in the hidden layers of the neural
+                                        network.</p>
+                                </div>
+                              </div> 
+                        </div>
+                      </div>
+                      <button x-on:click="loadAgent()" type="button" class="nes-btn is-warning my-6">Load
+                        Agents</button>
                 </div>
-               
-                <div class="h-32  grid grid-rows-2 rounded-lg ">
-                    <span class="text-white">Game Speed </span>
-                    <label>
-                        <input x-model="data.gameConfig.gameSpeed" type="radio" class="nes-radio is-dark" name="player"
-                            value="20" />
-                        <span>Slow</span>
-                    </label>
-
-                    <label>
-                        <input x-model="data.gameConfig.gameSpeed" type="radio" class="nes-radio is-dark" name="player"
-                            value="10" />
-                        <span>Fast</span>
-                    </label>
-                    <label>
-                        <input x-model="data.gameConfig.gameSpeed" type="radio" class="nes-radio is-dark" name="player"
-                            value="1" />
-                        <span>Super Fast</span>
-                    </label>
+                <div class=" ">
+                    <p class="text-xl my-4 text-blue-600">Game</p>
+                    <div class="h-99  min-w-full">
+                        <div class="nes-container  is-rounded is-dark ">
+                            <canvas class="w-full h-full " id="pongCanvas"></canvas>
+                        </div>
+            
+            
+                        <div class="grid grid-cols-1 gap-4 lg:grid-cols-2  lg:gap-8">
+                            <div class="">
+                                <p class=""> Player Success</p>
+                                <p x-text="data.gameConfig.scoreRight/100 + data.gameConfig.iterationRight" class="text-blue-400"></p>
+            
+                                <progress x-bind:value="data.gameConfig.scoreRight" class="nes-progress is-primary"  max="100"></progress>
+                                <p x-text="data.gameConfig.scoreLeft/100 + data.gameConfig.iterationLeft" class="text-red-400"></p>
+                                <progress x-bind:value="data.gameConfig.scoreLeft" class="nes-progress is-error" max="100"></progress>
+                            </div>
+                           
+                            <div class="grid gap-1 grid-rows-3 ">
+                                <span class="">Game Speed </span>
+                                <label>
+                                    <input x-model="data.gameConfig.gameSpeed" type="radio" class="nes-radio" name="player"
+                                        value="20" />
+                                    <span>Slow</span>
+                                </label>
+                                <label>
+                                    <input x-model="data.gameConfig.gameSpeed" type="radio" class="nes-radio" name="player"
+                                        value="10" />
+                                    <span>Fast</span>
+                                </label>
+                                <label>
+                                    <input x-model="data.gameConfig.gameSpeed" type="radio" class="nes-radio" name="player"
+                                        value="1" />
+                                    <span>Super Fast</span>
+                                </label>
+                            </div>
+                        </div>
+            
+                    </div>
                 </div>
             </div>
 
         </div>
-        <div class="p-6 rounded-lg -order-1  lg:col-span-1">
-            <p class="text-xs mb-2"> The main idea behind DQN is to use a deep neural network to estimate the expected
-                future rewards (Q-values) for
-                each possible action in a given state. </p>
-            <p class="text-xs mb-2"> By training the neural network on the agent's experiences, DQN can learn
-                to map high-dimensional states to the best actions to take in those states.</p>
-            <div class="nes-container with-title is-centered">
+    </div>
 
-                <div class="grid grid-cols-1  lg:grid-cols-2 ">
-                    <div class=" rounded-lg ">
+    <div class="grid p-4 grid-cols-1 bg-blue-400 gap-4 lg:grid-cols-2 lg:gap-8">
+        <div class="custify-center">
+            <a href="https://github.com/o-kollar/DQN" target="_blank">View Code on <i class="nes-icon github "></i></a>
+        </div>
+        <div class=" "></div>
+      </div>
 
-                        <div class="p-6 lists">
-
-                            <ul class=" nes-list is-circle">
-                                <div class="nes-field">
-                                    <label for="name_field">gamma</label>
-                                    <input x-model="data.agentConfig.gamma" x-text="data.agentConfig.gamma" type="text"
-                                        id="name_field" class="nes-input">
-                                </div>
-                                <li class="text-xs my-4">determines the importance of future rewards.</li>
-                                <div class="nes-field">
-                                    <label for="name_field">epsilon</label>
-                                    <input x-model="data.agentConfig.epsilon" x-text="data.agentConfig.epsilon"
-                                        type="text" id="name_field" class="nes-input">
-                                </div>
-                                <li class="text-xs my-4">It balances exploration (trying new actions) and exploitation
-                                    (choosing the best action based on current knowledge).</li>
-                                <div class="nes-field">
-                                    <label for="name_field">alpha</label>
-                                    <input x-model="data.agentConfig.alpha" x-text="data.agentConfig.alpha" type="text"
-                                        id="name_field" class="nes-input">
-                                </div>
-                                <li class="text-xs my-4">It controls how much the Q-values are adjusted based on new
-                                    experiences.</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="rounded-lg ">
-                        <div class="p-6 lists">
-
-                            <ul class="nes-list is-circle">
-                                <div class="nes-field">
-                                    <label for="name_field">Learning Steps</label>
-                                    <input x-model="data.agentConfig.learning_steps_per_iteration"
-                                        x-text="data.agentConfig.learning_steps_per_iteration" type="text"
-                                        id="name_field" class="nes-input">
-                                </div>
-                                <li class="text-xs my-4">The number of learning steps (updates to the neural network)
-                                    performed per iteration.</li>
-
-                                <div class="nes-field">
-                                    <label for="name_field">Experience size</label>
-                                    <input x-model="data.agentConfig.experience_size"
-                                        x-text="data.agentConfig.experience_size" type="text" id="name_field"
-                                        class="nes-input">
-                                </div>
-                                <li class="text-xs my-4">A larger replay buffer allows the agent to learn from a diverse
-                                    set of experiences</li>
-
-
-                                <div class="nes-field">
-                                    <label for="name_field">Hidden units</label>
-                                    <input x-model="data.agentConfig.num_hidden_units"
-                                        x-text="data.agentConfig.num_hidden_units" type="text" id="name_field"
-                                        class="nes-input">
-                                </div>
-                                <li class="text-xs my-4">Hidden units are the neurons in the hidden layers of the neural
-                                    network.</li>
-
-                                <button x-on:click="loadAgent()" type="button" class="nes-btn is-warning">Load
-                                    Agents</button>
-                            </ul>
-                        </div>
-                        <div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-
-
-
-
-            <script src="./reinforce/utils.js"></script>
-            <script src="./reinforce/rl.js"></script>
-            <script src="./scripts/pong.js"></script>
+    <script src="./reinforce/utils.js"></script>
+    <script src="./reinforce/rl.js"></script>
+    <script src="./scripts/pong.js"></script>
 
 </body>
 
