@@ -119,28 +119,15 @@ function movePaddles() {
     updatePreviousPaddlePositions();
 
     // Move left paddle
-    movePaddle(action1, paddleLeft, 'w', 's', previousPaddleLeftY);
+    movePaddle(action1, paddleLeft,  previousPaddleLeftY);
 
     // Move right paddle
-    movePaddle(action2, paddleRight, 'ArrowUp', 'ArrowDown', previousPaddleRightY);
+    movePaddle(action2, paddleRight, previousPaddleRightY);
 }
 
 // Function to move paddle
-function movePaddle(action, paddle, upKey, downKey, previousPaddleY) {
+function movePaddle(action, paddle) {
     // Check if the player is controlling the paddle
-    if (data.gameConfig.redPlayer === true) {
-        // Add event listener for keydown event
-        document.addEventListener('keydown', function(event) {
-            // Check if the pressed key is the up key
-            if (event.key === upKey && paddle.y > 0) {
-                paddle.y -= 0.08; // Move the paddle up
-            }
-            // Check if the pressed key is the down key
-            if (event.key === downKey && paddle.y < canvas.height - paddle.height) {
-                paddle.y += 0.08; // Move the paddle down
-            }
-        });
-    } else {
         // Move paddle based on AI action
         if (action === 0 && paddle.y > 0) {
             paddle.y -= 10; // Move the paddle up
@@ -148,7 +135,6 @@ function movePaddle(action, paddle, upKey, downKey, previousPaddleY) {
         if (action === 1 && paddle.y < canvas.height - paddle.height) {
             paddle.y += 10; // Move the paddle down
         }
-    }
 }
 
 
@@ -159,7 +145,7 @@ function calculateDistance(ballX, paddleX) {
 
 // Calculate reward based on score and distance
 function calculateReward(score, distance) {
-    return -(score / 1000) * distance;
+    return -(score / 10000) * distance;
 }
 
 let reward1 = [] 
@@ -179,7 +165,6 @@ function handleCollisions() {
 
     
             agent.learn(points / 1000);
-            console.log("Points",points/1000) 
             touched = false;
         
         
@@ -220,6 +205,7 @@ function handleCollisions() {
        data.gameConfig.scoreRight = 0;
           data.gameConfig.winRight++;
           if(data.gameConfig.winRight > data.gameConfig.winLeft){
+            data.gameConfig.iterationRight++
             Red.buildNet()
             data.gameConfig.winRight = 0
           }
@@ -238,6 +224,7 @@ function handleCollisions() {
            data.gameConfig.scoreLeft = 0;
            data.gameConfig.winLeft++;
            if(data.gameConfig.winLeft > data.gameConfig.winRight){
+            data.gameConfig.iterationLeft++
              Blue.buildNet();
              data.gameConfig.winLeft = 0
            }

@@ -8,14 +8,13 @@
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="//unpkg.com/alpinejs"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- minify -->
 
 
     <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
     <link href="https://unpkg.com/nes.css/css/nes.css" rel="stylesheet" />
 
 
-    <script src="./scripts/alpine.js"></script>
+    <script src="./scripts/config.js"></script>
 </head>
 
 <body class="w-full h-full bg-[conic-gradient(at_bottom_left,_var(--tw-gradient-stops))] from-slate-100  to-amber-100">
@@ -23,26 +22,28 @@
     <p class="text-sm p-2 m-5">Deep Q-Network, is a reinforcement learning algorithm that combines the
         strengths of deep learning and Q-learning. </p>
 
-        <a href="http://ir.hit.edu.cn/~jguo/docs/notes/dqn-atari.pdf" class="text-blue-600 text-xs p-6" target="_blank">Read More</a>
+    <a href="http://ir.hit.edu.cn/~jguo/docs/notes/dqn-atari.pdf" class="text-blue-600 text-xs p-6" target="_blank">Read
+        More</a>
 
 
 
 
     <div class="grid w-full grid-cols-1  gap-4 lg:grid-cols-2 lg:gap-8">
-        <div class="p-2 h-99 min-h-32  bg-zinc-800 min-w-full">
-            <div class="nes-container is-rounded is-dark">
+        <div class="p-2 h-99 min-h-32  bg-zinc-700  min-w-full">
+            <div class="nes-container  is-rounded is-dark ">
                 <canvas class="w-full h-full " id="pongCanvas"></canvas>
             </div>
-          
 
-            <label>
-                <input x-model="data.gameConfig.redPlayer" type="checkbox" class="nes-checkbox is-dark" />
-                <span class="text-white">Play as</span><span class="text-red-400"> Red</span>
-            </label>
-            <p x-text="data.gameConfig.winLeft" class="text-red-400"></p>
-            <p x-text="data.gameConfig.winRight" class="text-blue-400"></p> 
 
             <div class="grid grid-cols-1 gap-4 lg:grid-cols-2  lg:gap-8">
+                <div class="p-2">
+                    <p x-text="data.gameConfig.scoreRight/100 + data.gameConfig.iterationRight" class="text-blue-400"></p>
+
+                    <progress x-bind:value="data.gameConfig.scoreRight" class="nes-progress is-primary"  max="100"></progress>
+                    <p x-text="data.gameConfig.scoreLeft/100 + data.gameConfig.iterationLeft" class="text-red-400"></p>
+                    <progress x-bind:value="data.gameConfig.scoreLeft" class="nes-progress is-error" max="100"></progress>
+                </div>
+               
                 <div class="h-32  grid grid-rows-2 rounded-lg ">
                     <span class="text-white">Game Speed </span>
                     <label>
@@ -62,19 +63,14 @@
                         <span>Super Fast</span>
                     </label>
                 </div>
-
-                <div class="h-32 rounded-lg ">
-                    <p class="text-white">Move with </p>
-                    <button type="button" class="nes-btn is-disabled">W</button>
-                    <button type="button" class="nes-btn is-disabled">S</button>
-                </div>
-            
             </div>
 
         </div>
         <div class="p-6 rounded-lg -order-1  lg:col-span-1">
-            <p class="text-xs mb-2"> The main idea behind DQN is to use a deep neural network to estimate the expected future rewards (Q-values) for
-                each possible action in a given state. </p> <p class="text-xs mb-2"> By training the neural network on the agent's experiences, DQN can learn
+            <p class="text-xs mb-2"> The main idea behind DQN is to use a deep neural network to estimate the expected
+                future rewards (Q-values) for
+                each possible action in a given state. </p>
+            <p class="text-xs mb-2"> By training the neural network on the agent's experiences, DQN can learn
                 to map high-dimensional states to the best actions to take in those states.</p>
             <div class="nes-container with-title is-centered">
 
@@ -114,20 +110,21 @@
                                 <div class="nes-field">
                                     <label for="name_field">Learning Steps</label>
                                     <input x-model="data.agentConfig.learning_steps_per_iteration"
-                                        x-text="data.agentConfig.learning_steps_per_iteration" type="text" id="name_field"
+                                        x-text="data.agentConfig.learning_steps_per_iteration" type="text"
+                                        id="name_field" class="nes-input">
+                                </div>
+                                <li class="text-xs my-4">The number of learning steps (updates to the neural network)
+                                    performed per iteration.</li>
+
+                                <div class="nes-field">
+                                    <label for="name_field">Experience size</label>
+                                    <input x-model="data.agentConfig.experience_size"
+                                        x-text="data.agentConfig.experience_size" type="text" id="name_field"
                                         class="nes-input">
                                 </div>
-                                <li class="text-xs my-4">The number of learning steps (updates to the neural network) performed per iteration.</li>
+                                <li class="text-xs my-4">A larger replay buffer allows the agent to learn from a diverse
+                                    set of experiences</li>
 
-                                    <div class="nes-field">
-                                        <label for="name_field">Experience size</label>
-                                        <input x-model="data.agentConfig.experience_size"
-                                            x-text="data.agentConfig.experience_size" type="text" id="name_field"
-                                            class="nes-input">
-                                    </div>
-                                    <li class="text-xs my-4">A larger replay buffer allows the agent to learn from a diverse
-                                        set of experiences</li>
-    
 
                                 <div class="nes-field">
                                     <label for="name_field">Hidden units</label>
@@ -138,7 +135,7 @@
                                 <li class="text-xs my-4">Hidden units are the neurons in the hidden layers of the neural
                                     network.</li>
 
-                                <button x-on:click="loadAgent()" type="button" class="nes-btn is-warning">Reload
+                                <button x-on:click="loadAgent()" type="button" class="nes-btn is-warning">Load
                                     Agents</button>
                             </ul>
                         </div>
@@ -155,7 +152,7 @@
 
             <script src="./reinforce/utils.js"></script>
             <script src="./reinforce/rl.js"></script>
-            <script src="./pong.js"></script>
+            <script src="./scripts/pong.js"></script>
 
 </body>
 
