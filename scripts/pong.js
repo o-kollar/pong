@@ -144,7 +144,7 @@ function handleCollisions() {
     // Function to update rewards and learning for agents
     function updateRewardsAndLearning(agent, rewardArray, score, touched, points) {
         if (rewardArray < 1) {
-            agent.learn(points / 1000);
+            agent.learn(points / 100);
         }
     }
 
