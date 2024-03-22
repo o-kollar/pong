@@ -2,7 +2,7 @@ let data = Alpine.reactive({
     agentConfig: {
         gamma: 0.6,
         epsilon: 0.3,
-        alpha: 0.003,
+        alpha: 0.005,
         experience_add_every: 1,
         experience_size: 50000,
         learning_steps_per_iteration: 32,
