@@ -153,13 +153,13 @@ function handleCollisions() {
 
     // Function to update rewards and learning for agents
     function updateRewardsAndLearning(agent, rewardArray, score, touched,points) {
-
-    
+        if(rewardArray < 1){
             agent.learn(points / 1000);
-            touched = false;
+        }
+    
+            
+            
         
-        
-        rewardArray.push(score);
     }
 
     // Check collision with left paddle
@@ -167,7 +167,7 @@ function handleCollisions() {
         data.gameConfig.touchLeft = true;
         ball.dx = Math.abs(ball.dx) + 0.5; // Increase horizontal velocity and reverse direction
         ball.dy *= 1; // Increase vertical velocity slightly
-        updateRewardsAndLearning(Red, reward1, RewardLeft, data.gameConfig.touchedRight,data.gameConfig.scoreLeft);
+        updateRewardsAndLearning(Red, data.gameConfig.winLeft, RewardLeft, data.gameConfig.touchedRight,data.gameConfig.scoreLeft);
     }
 
     // Check collision with right paddle
@@ -175,14 +175,14 @@ function handleCollisions() {
         data.gameConfig.touchedRight = true;
         ball.dx = -Math.abs(ball.dx) - 0.5; // Increase horizontal velocity and reverse direction
         ball.dy *= 1; // Increase vertical velocity slightly
-        updateRewardsAndLearning(Blue, reward2, RewardRight, data.gameConfig.touchLeft,data.gameConfig.scoreRight);
+        updateRewardsAndLearning(Blue, data.gameConfig.winRight, RewardRight, data.gameConfig.touchLeft,data.gameConfig.scoreRight);
     }
 
     // Score points and reset ball position if it goes out of bounds
     function scoreAndResetBall(agent, rewardArray, score) {
-      agent.learn(score);
-      
-        rewardArray.push(score);
+        if(rewardArray < 1 ){
+            agent.learn(score);
+        }
         resetBall();
     }
 
@@ -203,7 +203,7 @@ function handleCollisions() {
           }
         }
 
-        scoreAndResetBall(Red, reward1, RewardLeft);
+        scoreAndResetBall(Red, data.gameConfig.winLeft, RewardLeft);
 
     } else if (ball.x + ball.radius > canvas.width) {
         if(data.gameConfig.scoreLeft <100){
@@ -225,7 +225,7 @@ function handleCollisions() {
            }
         }
        
-        scoreAndResetBall(Blue, reward2, RewardRight);
+        scoreAndResetBall(Blue, data.gameConfig.winRight, RewardRight);
 
     }
 }
