@@ -25,6 +25,8 @@ function initializeGame() {
     ball = { x: canvas.width / 2, y: canvas.height / 2, radius: 4, dx: 5, dy: 5 };
     paddleLeft = { x: 10, y: canvas.height / 2 - 50, width: 6, height: 35 };
     paddleRight = { x: canvas.width - 20, y: canvas.height / 2 - 50, width: 6, height: 35 };
+    Red.buildNet();
+    Blue.buildNet();
 }
 
 // Main game loop
