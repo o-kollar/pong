@@ -3,18 +3,16 @@ const ctx = canvas.getContext('2d');
 
 // Define the environment
 
-
-
 let Red = new Agent(data.gameConfig.env, data.agentConfig);
 let Blue = new Agent(data.gameConfig.env, data.agentConfig);
 
-function loadAgent(){
-  Red.buildNet();
-  Blue.buildNet();
-   data.gameConfig.scoreLeft = 0;
-   data.gameConfig.scoreRight = 0;
-   data.gameConfig.touchLeft
-   data.gameConfig.scores = [0,0]
+function loadAgent() {
+    Red.buildNet();
+    Blue.buildNet();
+    data.gameConfig.scoreLeft = 0;
+    data.gameConfig.scoreRight = 0;
+    data.gameConfig.touchLeft;
+    data.gameConfig.scores = [0, 0];
 }
 
 // Initialize game elements
@@ -33,12 +31,9 @@ function initializeGame() {
 function gameLoop() {
     update();
     draw();
-   
-    setTimeout(gameLoop,data.gameConfig.gameSpeed)
+
+    setTimeout(gameLoop, data.gameConfig.gameSpeed);
 }
-
-
-
 
 // Update game state
 function update() {
@@ -73,14 +68,11 @@ function moveBall() {
     }
 }
 
-
-
 // Function to update previous paddle positions
 function updatePreviousPaddlePositions() {
     previousPaddleLeftY = paddleLeft.y;
     previousPaddleRightY = paddleRight.y;
 }
-
 
 // Function to get game state
 function getGameState(paddle, opponentPaddle, previousPaddleY) {
@@ -88,21 +80,19 @@ function getGameState(paddle, opponentPaddle, previousPaddleY) {
         ball.y, // Ball y-position
         ball.x, // Ball x-position
         ball.dx, // Ball x-velocity
-        ball.dy, // Ball y-velocity 
+        ball.dy, // Ball y-velocity
         paddle.y, // Paddle y-position
         (paddle.y - ball.y) / canvas.height, // Paddle relative y-position
         paddle.y - previousPaddleY, // Paddle movement direction
         (opponentPaddle.y - ball.y) / canvas.height, // Opponent paddle relative y-position
     ];
 }
-  
-
 
 function movePaddles() {
     // Get actions from agents
-    const RedState = getGameState(paddleLeft, paddleRight,previousPaddleLeftY);
-    const BlueState = getGameState(paddleRight, paddleLeft,previousPaddleRightY);
-    
+    const RedState = getGameState(paddleLeft, paddleRight, previousPaddleLeftY);
+    const BlueState = getGameState(paddleRight, paddleLeft, previousPaddleRightY);
+
     const action1 = Red.act(RedState);
     const action2 = Blue.act(BlueState);
 
@@ -110,7 +100,7 @@ function movePaddles() {
     updatePreviousPaddlePositions();
 
     // Move left paddle
-    movePaddle(action1, paddleLeft,  previousPaddleLeftY);
+    movePaddle(action1, paddleLeft, previousPaddleLeftY);
 
     // Move right paddle
     movePaddle(action2, paddleRight, previousPaddleRightY);
@@ -119,15 +109,14 @@ function movePaddles() {
 // Function to move paddle
 function movePaddle(action, paddle) {
     // Check if the player is controlling the paddle
-        // Move paddle based on AI action
-        if (action === 0 && paddle.y > 0) {
-            paddle.y -= 10; // Move the paddle up
-        }
-        if (action === 1 && paddle.y < canvas.height - paddle.height) {
-            paddle.y += 10; // Move the paddle down
-        }
+    // Move paddle based on AI action
+    if (action === 0 && paddle.y > 0) {
+        paddle.y -= 10; // Move the paddle up
+    }
+    if (action === 1 && paddle.y < canvas.height - paddle.height) {
+        paddle.y += 10; // Move the paddle down
+    }
 }
-
 
 // Calculate distance between the ball and a paddle
 function calculateDistance(ballX, paddleX) {
@@ -139,9 +128,8 @@ function calculateReward(score, distance) {
     return -(score / 10000) * distance;
 }
 
-let reward1 = [] 
-let reward2 = []
-
+let reward1 = [];
+let reward2 = [];
 
 // Function to handle collisions and update rewards
 function handleCollisions() {
@@ -152,14 +140,10 @@ function handleCollisions() {
     const RewardRight = calculateReward(data.gameConfig.scoreLeft, distToRightPaddle);
 
     // Function to update rewards and learning for agents
-    function updateRewardsAndLearning(agent, rewardArray, score, touched,points) {
-        if(rewardArray < 1){
+    function updateRewardsAndLearning(agent, rewardArray, score, touched, points) {
+        if (rewardArray < 1) {
             agent.learn(points / 1000);
         }
-    
-            
-            
-        
     }
 
     // Check collision with left paddle
@@ -167,7 +151,7 @@ function handleCollisions() {
         data.gameConfig.touchLeft = true;
         ball.dx = Math.abs(ball.dx) + 0.5; // Increase horizontal velocity and reverse direction
         ball.dy *= 1; // Increase vertical velocity slightly
-        updateRewardsAndLearning(Red, data.gameConfig.winLeft, RewardLeft, data.gameConfig.touchedRight,data.gameConfig.scoreLeft);
+        updateRewardsAndLearning(Red, data.gameConfig.winLeft, RewardLeft, data.gameConfig.touchedRight, data.gameConfig.scoreLeft);
     }
 
     // Check collision with right paddle
@@ -175,61 +159,64 @@ function handleCollisions() {
         data.gameConfig.touchedRight = true;
         ball.dx = -Math.abs(ball.dx) - 0.5; // Increase horizontal velocity and reverse direction
         ball.dy *= 1; // Increase vertical velocity slightly
-        updateRewardsAndLearning(Blue, data.gameConfig.winRight, RewardRight, data.gameConfig.touchLeft,data.gameConfig.scoreRight);
+        updateRewardsAndLearning(Blue, data.gameConfig.winRight, RewardRight, data.gameConfig.touchLeft, data.gameConfig.scoreRight);
     }
 
     // Score points and reset ball position if it goes out of bounds
     function scoreAndResetBall(agent, rewardArray, score) {
-        if(rewardArray < 1 ){
+        if (rewardArray < 1) {
             agent.learn(score);
         }
         resetBall();
     }
 
     if (ball.x - ball.radius < 0) {
-        if(data.gameConfig.scoreRight < 100){
-            if(data.gameConfig.scoreLeft > 0){ data.gameConfig.scoreLeft--;}
+        if (data.gameConfig.scoreRight < 100) {
+            if (data.gameConfig.scoreLeft > 0) {
+                data.gameConfig.scoreLeft--;
+            }
             data.gameConfig.scores[1]++;
             data.gameConfig.scoreRight++;
-        }else{
-       data.gameConfig.scoreRight = 0;
-          data.gameConfig.winRight++;
-          if(data.gameConfig.winRight > data.gameConfig.winLeft){
-            data.gameConfig.iterationRight++
-            Red.buildNet()
-            data.gameConfig.iterationLeft = 0
-            data.gameConfig.winRight = 0
-            data.gameConfig.scores = [0,0];
-          }
+        } else {
+            data.gameConfig.scoreRight = 0;
+            data.gameConfig.winRight++;
+            if (data.gameConfig.winRight > data.gameConfig.winLeft) {
+                data.gameConfig.iterationRight++;
+                if(data.gameConfig.scoreLeft < 0.3){
+                    Red.buildNet();
+                }
+                data.gameConfig.iterationLeft = 0;
+                data.gameConfig.winRight = 0;
+                data.gameConfig.scores = [0, 0];
+            }
         }
 
         scoreAndResetBall(Red, data.gameConfig.winLeft, RewardLeft);
-
     } else if (ball.x + ball.radius > canvas.width) {
-        if(data.gameConfig.scoreLeft <100){
+        if (data.gameConfig.scoreLeft < 100) {
             data.gameConfig.scoreLeft++;
-            if(data.gameConfig.scoreRight > 0){
+            if (data.gameConfig.scoreRight > 0) {
                 data.gameConfig.scoreRight--;
             }
             data.gameConfig.scores[0]++;
-            
-        }else{
-           data.gameConfig.scoreLeft = 0;
-           data.gameConfig.winLeft++;
-           if(data.gameConfig.winLeft > data.gameConfig.winRight){
-            data.gameConfig.iterationLeft++
-             Blue.buildNet();
-             data.gameConfig.iterationRight = 0;
-             data.gameConfig.winLeft = 0
-             data.gameConfig.scores = [0,0];
-           }
+        } else {
+            data.gameConfig.scoreLeft = 0;
+            data.gameConfig.winLeft++;
+            if (data.gameConfig.winLeft > data.gameConfig.winRight) {
+                data.gameConfig.iterationLeft++;
+                if(data.gameConfig.scoreRight < 0.3){
+                    Blue.buildNet();
+                }
+                
+                data.gameConfig.iterationRight = 0;
+                data.gameConfig.winLeft = 0;
+                data.gameConfig.scores = [0, 0];
+            }
         }
-       
-        scoreAndResetBall(Blue, data.gameConfig.winRight, RewardRight);
 
+        scoreAndResetBall(Blue, data.gameConfig.winRight, RewardRight);
     }
 }
-
 
 // Draw game elements
 function draw() {
@@ -257,7 +244,6 @@ function draw() {
     ctx.fillText(`Score: ${data.gameConfig.scores[1]}`, canvas.width - 120, 30);
 }
 
-
 // Reset ball to center
 // Reset ball to center
 function resetBall() {
@@ -270,4 +256,3 @@ function resetBall() {
 // Initialize the game and start the loop
 initializeGame();
 gameLoop();
-
