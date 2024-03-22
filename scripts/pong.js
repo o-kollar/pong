@@ -195,7 +195,7 @@ function handleCollisions() {
 
         scoreAndResetBall(Red, data.gameConfig.winLeft, RewardLeft);
     } else if (ball.x + ball.radius > canvas.width) {
-        if (data.gameConfig.scoreLeft < 100) {
+        if (data.gameConfig.scoreLeft < 1000) {
             data.gameConfig.scoreLeft++;
             if (data.gameConfig.scoreRight > 0) {
                 data.gameConfig.scoreRight--;
