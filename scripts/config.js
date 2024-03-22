@@ -1,6 +1,6 @@
 let data = Alpine.reactive({
     agentConfig: {
-        gamma: 0.6,
+        gamma: 0.5,
         epsilon: 0.2,
         alpha: 0.005,
         experience_add_every: 1,
