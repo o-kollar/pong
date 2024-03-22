@@ -98,14 +98,14 @@ function movePaddles() {
     const action1 = Red.act(RedState);
     const action2 = Blue.act(BlueState);
 
-    // Update previous paddle positions
-    updatePreviousPaddlePositions();
-
     // Move left paddle
     movePaddle(action1, paddleLeft, previousPaddleLeftY);
 
     // Move right paddle
     movePaddle(action2, paddleRight, previousPaddleRightY);
+
+    // Update previous paddle positions
+    updatePreviousPaddlePositions();
 }
 
 // Function to move paddle
@@ -184,7 +184,7 @@ function handleCollisions() {
             data.gameConfig.winRight++;
             if (data.gameConfig.winRight > data.gameConfig.winLeft) {
                 data.gameConfig.iterationRight++;
-                if(data.gameConfig.scoreLeft < 0.3){
+                if (data.gameConfig.scoreLeft < 0.3) {
                     Red.buildNet();
                 }
                 data.gameConfig.iterationLeft = 0;
@@ -206,10 +206,10 @@ function handleCollisions() {
             data.gameConfig.winLeft++;
             if (data.gameConfig.winLeft > data.gameConfig.winRight) {
                 data.gameConfig.iterationLeft++;
-                if(data.gameConfig.scoreRight < 0.3){
+                if (data.gameConfig.scoreRight < 0.3) {
                     Blue.buildNet();
                 }
-                
+
                 data.gameConfig.iterationRight = 0;
                 data.gameConfig.winLeft = 0;
                 data.gameConfig.scores = [0, 0];
