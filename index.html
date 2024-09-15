@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deep Q-learning Network</title>
+    <title>Pong</title>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="//unpkg.com/alpinejs"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -21,16 +21,10 @@
 
     <div class="grid grid-cols-1 gap-4">
         <div class="p-4">
-            <span class="nes-text m-2 pt-4 pl-4  text-5xl text-blue-600">DQN</span>
-            <p class="text-sm p-2 m-2">Deep Q-Network, is a reinforcement learning algorithm that combines the
-                strengths of deep learning and Q-learning. </p>
-                <p class="text-xs p-2 mx-2"> The main idea behind DQN is to use a deep neural network to estimate the expected
-                    future rewards (Q-values) for
-                    each possible action in a given state. </p>
-                <p class="text-xs p-2 mx-2"> By training the neural network on the agent's experiences, DQN can learn
-                    to map high-dimensional states to the best actions to take in those states.</p>
-                     <a href="http://ir.hit.edu.cn/~jguo/docs/notes/dqn-atari.pdf" class="text-blue-600 text-xs p-4" target="_blank">Read
-                More</a>
+            <span class="nes-text m-2 pt-4 pl-4  text-5xl text-blue-600">Pong</span>
+            <p class="text-sm p-2 m-2">The AI agents in this Pong game, Red and Blue, use neural networks and reinforcement learning to play and improve over time. Each agent observes the game state, including ball and paddle positions, and makes decisions on whether to move their paddle up or down. </p>
+                <p class="text-xs p-2 mx-2">Using Q-learning, the agents aim to maximize their score by learning which actions lead to positive outcomes.</p>
+                   
         </div>
         <div class="p-6 ">
 
